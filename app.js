@@ -66,19 +66,18 @@ app.post('/add_senator', function(req, res) {
 });
 
 app.get('/:id', function(req, res) {
-  const senatorId = parseInt(request.params.id);
-  Senator.findAndSort({
+  const senatorId = req.params.id;
+  Senator.findSenator({
     id: senatorId
   }, function(results) {
     res.render('specific_senator', {
-      senatorId: senatorId,
-      senators: results
+      senator: results
     });
   })
 });
 
 app.post('/:id', function(req, res) {
-  const senatorId = parseInt(request.params.id);
+  const senatorId = req.params.id;
   Senator.deleteSenator({ id: senatorId }, function() {
     res.redirect('/')
     console.log('successful deletion!');

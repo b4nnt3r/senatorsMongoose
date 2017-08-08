@@ -9,6 +9,7 @@ const senatorSchema = new Schema({
     required: true,
     unique: true
   },
+  congress_numbers: String,
   party: {
     type: String,
     required: true
@@ -33,7 +34,12 @@ const senatorSchema = new Schema({
     birthday: {
       type: Date,
       required: true
-    }
+    },
+    bioguideid: String,
+    cspanid: Number,
+    twitterid: String,
+    youtubeid: String,
+    gender_label: String
   },
   phone: {
     type: String,
@@ -44,7 +50,11 @@ const senatorSchema = new Schema({
     contact_form: String,
     fax: String,
     office: String
-  }
+  },
+  startdate: Date,
+  enddate: Date,
+  description: String,
+
 })
 
 senatorSchema.statics.findAndSort = function(find, render) {
@@ -56,11 +66,19 @@ senatorSchema.statics.findAndSort = function(find, render) {
     });
 }
 
+senatorSchema.statics.findSenator = function(find, render) {
+  this
+    .findOne(find)
+    .then(function(results) {
+      render(results);
+    });
+}
+
 senatorSchema.statics.deleteSenator = function(find, render) {
   this
     .deleteOne(find)
-    .then(function() {
-      render();
+    .then(function(senator) {
+      render(senator);
     });
 }
 
