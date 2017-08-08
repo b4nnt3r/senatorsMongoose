@@ -6,7 +6,8 @@ mongoose.connect('mongodb://localhost:27017/senatorsdb');
 const senatorSchema = new Schema({
   id: {
     type: Number,
-    required: true
+    required: true,
+    unique: true
   },
   party: {
     type: String,
@@ -49,11 +50,20 @@ const senatorSchema = new Schema({
 senatorSchema.statics.findAndSort = function(find, render) {
   this
     .find(find)
+    .sort({ 'person.lastname': 1})
     .then(function(results) {
       render(results);
     });
 }
 
-const Senator = mongoose.model('Senator', senatorSchema, 'senatorsdb');
+senatorSchema.statics.deleteSenator = function(find, render) {
+  this
+    .deleteOne(find)
+    .then(function() {
+      render();
+    });
+}
+
+const Senator = mongoose.model('Senator', senatorSchema, 'senators');
 
 module.exports = Senator;

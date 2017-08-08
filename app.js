@@ -30,60 +30,11 @@ app.set('views', './views');
 // Connect view engine to mustache
 app.set('view engine', 'mustache');
 
-// var findAllSenators = function(db, callback) {
-//   var collection = db.collection('senators');
-//   collection.find().sort({
-//     "person.lastname": 1
-//   }).toArray(function(err, results) {
-//     callback(results);
-//   });
-// };
-//
-// var findLargestId = function(db, callback) {
-//   var collection = db.collection('senators');
-//   collection.find().sort({
-//     id: -1
-//   }).toArray(function(err, results) {
-//     db.close();
-//     callback(parseInt(results[0].id));
-//   });
-// };
-//
-// var findSpecificSenator = function(db, id, callback) {
-//   var collection = db.collection('senators');
-//   collection.findOne({
-//     "id": id
-//   }, function(err, doc) {
-//     db.close();
-//     if (err) {
-//       console.log('Error fetching specific senator with id: ' + id);
-//     } else {
-//       callback(doc);
-//     }
-//   });
-// };
-//
-var deleteSpecificSenator = function(db, id, callback) {
-  var collection = db.collection('senators');
-  collection.deleteOne({
-    "id": id
-  }).then(function(result) {
-    db.close();
-    if (result.deletedCount == 1) {
-      callback(true);
-    } else {
-      callback(false);
-    }
-  }).catch(function(error) {
-    console.log('Error deleting record');
-  });
-};
-
 app.get('/', function(req, res) {
   // render a page template called index and pass an object
-  Senator.findAndSort({}, function(results) {
+  Senator.findAndSort({}, function(senators) {
     res.render('index', {
-      senators: results
+      senators
     });
   })
 });
@@ -127,21 +78,12 @@ app.get('/:id', function(req, res) {
 });
 
 app.post('/:id', function(req, res) {
-
-
-  mongoClient.connect(url, function(err, db) {
-    if (err) {
-      console.log('Error connecting to Mongo DB: ' + err);
-    } else {
-      deleteSpecificSenator(db, parseInt(req.params.id), function(success) {
-        if (success) {
-          console.log('successful deletion!');
-          res.redirect('/');
-        } else {
-          console.log('Delete unsuccessful');
-        }
-      })
-    }
+  const senatorId = parseInt(request.params.id);
+  Senator.deleteSenator({ id: senatorId }, function() {
+    res.redirect('/')
+    console.log('successful deletion!');
+  }).catch(function(err){
+    console.log('Delete unsuccessful');
   });
 });
 
